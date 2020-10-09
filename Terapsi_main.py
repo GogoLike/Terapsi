@@ -21,6 +21,12 @@ class TerapsiDB:
         self.conn = sqlite3.connect("""Terapsi.db""")
         self.cursor = self.conn.cursor()
 
+        try:
+            self.cursor.execute("""CREATE TABLE Main_Playlist (num integer, song_path text);""")
+            self.conn.commit()
+        except sqlite3.OperationalError:
+            pass
+
     def rowsCount(self, table):
         self.cursor.execute("""Select Count(*) FROM %s;""" % str(table))
         count = self.cursor.fetchone()[0]
