@@ -1,6 +1,6 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QFileDialog, QTableWidgetItem, QAbstractItemView
-from PyQt5.QtCore import Qt, QSize
+from PyQt5.QtCore import Qt
 import sqlite3
 import mutagen
 
