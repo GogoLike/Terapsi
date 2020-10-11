@@ -1,6 +1,7 @@
 from PyQt5 import uic
 from PyQt5.QtWidgets import QApplication, QFileDialog, QTableWidgetItem, QAbstractItemView
-from PyQt5.QtCore import Qt
+from PyQt5.QtCore import Qt, QUrl
+from PyQt5.QtMultimedia import QMediaPlaylist, QMediaContent, QMediaPlayer
 import sqlite3
 import mutagen
 
@@ -61,8 +62,15 @@ class Terapsi:
         self.app = QApplication([])
         self.window = uic.loadUi("""Terapsi_Window.ui""")
 
+        self.media_player = QMediaPlayer()
+        self.media_playlist = QMediaPlaylist()
+
+        self.fillMediaPlaylist()
+
+        self.media_player.setPlaylist(self.media_playlist)
+
         self.window.playlist_table.setColumnCount(4)
-        self.window.playlist_table.setRowCount(20)
+        self.window.playlist_table.setRowCount(database.rowsCount("Main_Playlist"))
 
         self.window.playlist_table.horizontalHeader().resizeSection(0, 20)
         self.window.playlist_table.horizontalHeader().resizeSection(1, 420)
@@ -77,12 +85,21 @@ class Terapsi:
 
         self.window.actionOpen.triggered.connect(database.addMainPlaylist)
 
+        self.window.play_button.clicked.connect(self.playSong)
+        self.window.pause_button.clicked.connect(self.pauseSong)
+        self.window.stop_button.clicked.connect(self.stopSong)
+        self.window.next_button.clicked.connect(self.nextSong)
+        self.window.previous_button.clicked.connect(self.previousSong)
         self.window.clear_button.clicked.connect(self.clearPlaylist)
 
         self.window.show()
 
     def addPlaylistTable(self):
         self.window.playlist_table.clear()
+
+        self.fillMediaPlaylist()
+
+        self.window.playlist_table.setRowCount(database.rowsCount("Main_Playlist"))
 
         main_playlist = database.readMainPlaylist()
         i = 0
@@ -127,9 +144,41 @@ class Terapsi:
 
         self.window.playlist_table.setSelectionMode(QAbstractItemView.NoSelection)
 
+    def playSong(self):
+        self.media_player.play()
+        self.window.play_button.setEnabled(False)
+        self.window.pause_button.setEnabled(True)
+        self.window.stop_button.setEnabled(True)
+
+    def pauseSong(self):
+        self.media_player.pause()
+        self.window.play_button.setEnabled(True)
+        self.window.pause_button.setEnabled(False)
+        self.window.stop_button.setEnabled(True)
+
+    def stopSong(self):
+        self.media_player.stop()
+        self.window.pause_button.setEnabled(False)
+        self.window.stop_button.setEnabled(False)
+        self.window.play_button.setEnabled(True)
+
+    def nextSong(self):
+        self.media_player.playlist().next()
+
+    def previousSong(self):
+        self.media_player.playlist().previous()
+
     def clearPlaylist(self):
         database.clearMainPlaylist()
         self.window.playlist_table.clear()
+        self.media_playlist.clear()
+        self.window.playlist_table.setRowCount(database.rowsCount("Main_Playlist"))
+
+    def fillMediaPlaylist(self):
+        for path in database.readMainPlaylist():
+            url = QUrl("file:///%s" % str(path[1]))
+            media = QMediaContent(url)
+            self.media_playlist.addMedia(media)
 
 
 # =====================================================================================================================
