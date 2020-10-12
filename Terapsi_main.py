@@ -84,7 +84,14 @@ class Terapsi:
         if database.rowsCount("Main_Playlist") == 0:
             self.enableButtons()
 
+        self.setOnNow()
+
+        self.window.pause_button.setEnabled(False)
+        self.window.stop_button.setEnabled(False)
+
         self.window.playlist_table.cellClicked.connect(self.quadClicked)
+
+        self.media_playlist.currentIndexChanged.connect(self.indexChanged)
 
         self.window.actionOpen.triggered.connect(database.addMainPlaylist)
 
@@ -148,12 +155,13 @@ class Terapsi:
         self.window.playlist_table.selectRow(row_num)
 
         self.media_playlist.setCurrentIndex(row_num)
-        self.media_player.play()
+        self.playSong()
 
         self.window.playlist_table.setSelectionMode(QAbstractItemView.NoSelection)
 
     def playSong(self):
         self.media_player.play()
+        self.setOnNow()
         self.window.play_button.setEnabled(False)
         self.window.pause_button.setEnabled(True)
         self.window.stop_button.setEnabled(True)
@@ -195,6 +203,19 @@ class Terapsi:
         self.window.stop_button.setEnabled(enable)
         self.window.next_button.setEnabled(enable)
         self.window.previous_button.setEnabled(enable)
+
+    def setOnNow(self):
+        self.window.playlist_table.clearSelection()
+
+        self.window.playlist_table.setSelectionMode(QAbstractItemView.MultiSelection)
+
+        song_index = self.media_playlist.currentIndex()
+        self.window.playlist_table.selectRow(song_index)
+
+        self.window.playlist_table.setSelectionMode(QAbstractItemView.NoSelection)
+
+    def indexChanged(self):
+        self.setOnNow()
 
 
 # =====================================================================================================================
