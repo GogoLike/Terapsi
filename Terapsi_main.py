@@ -81,6 +81,9 @@ class Terapsi:
 
         self.addPlaylistTable()
 
+        if database.rowsCount("Main_Playlist") == 0:
+            self.enableButtons()
+
         self.window.playlist_table.cellClicked.connect(self.quadClicked)
 
         self.window.actionOpen.triggered.connect(database.addMainPlaylist)
@@ -98,6 +101,8 @@ class Terapsi:
         self.window.playlist_table.clear()
 
         self.fillMediaPlaylist()
+
+        self.enableButtons(True)
 
         self.window.playlist_table.setRowCount(database.rowsCount("Main_Playlist"))
 
@@ -142,6 +147,9 @@ class Terapsi:
         row_num = self.window.playlist_table.currentRow()
         self.window.playlist_table.selectRow(row_num)
 
+        self.media_playlist.setCurrentIndex(row_num)
+        self.media_player.play()
+
         self.window.playlist_table.setSelectionMode(QAbstractItemView.NoSelection)
 
     def playSong(self):
@@ -172,6 +180,7 @@ class Terapsi:
         database.clearMainPlaylist()
         self.window.playlist_table.clear()
         self.media_playlist.clear()
+        self.enableButtons()
         self.window.playlist_table.setRowCount(database.rowsCount("Main_Playlist"))
 
     def fillMediaPlaylist(self):
@@ -179,6 +188,13 @@ class Terapsi:
             url = QUrl("file:///%s" % str(path[1]))
             media = QMediaContent(url)
             self.media_playlist.addMedia(media)
+
+    def enableButtons(self, enable=False):
+        self.window.play_button.setEnabled(enable)
+        self.window.pause_button.setEnabled(enable)
+        self.window.stop_button.setEnabled(enable)
+        self.window.next_button.setEnabled(enable)
+        self.window.previous_button.setEnabled(enable)
 
 
 # =====================================================================================================================
