@@ -112,6 +112,10 @@
       <height>381</height>
      </rect>
     </property>
+    <property name="styleSheet">
+     <string notr="true">selection-background-color: rgb(255, 255, 127);
+selection-color: rgb(20, 20, 20)</string>
+    </property>
     <property name="verticalScrollBarPolicy">
      <enum>Qt::ScrollBarAsNeeded</enum>
     </property>
